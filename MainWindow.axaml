@@ -20,7 +20,6 @@
                          AcceptsTab="False"
                          VerticalContentAlignment="Center"
                          BorderBrush="#0075d6"
-                         Text="{Binding MeetingInfo_TextBox, Mode=TwoWay}"
                 />
                 
                 <TextBlock Margin="0 5" 
@@ -33,7 +32,6 @@
                          AcceptsTab="False"
                          VerticalContentAlignment="Center"
                          BorderBrush="#0075d6"
-                         Text="{Binding MeetingId_TextBox, Mode=TwoWay}"
                 />
                 
                 <TextBlock Margin="0 5" 
@@ -46,31 +44,30 @@
                          AcceptsTab="False"
                          VerticalContentAlignment="Center"
                          BorderBrush="#0075d6"
-                         Text="{Binding MeetingPwd_TextBox}"
                 />
                 
                 <TextBlock Margin="0 5" Text="Choose time to join meeting" FontSize="16"/>
                 <TimePicker Margin="0 5" Name="MeetingSelectedTime" ClockIdentifier="24HourClock" BorderBrush="#0075d6"/>
                 
                 <TextBlock Margin="0 5" Text="Press control to select multiple days!"></TextBlock>
-                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                         SelectionMode="Multiple" 
+                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         SelectionMode="Multiple"
                          Name="MeetingDays"
                          HorizontalAlignment="Left">
-                    
-                    <ListBox.ItemsPanel>
+                
+                <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel IsEnabled="True"/>
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
-                    
-                    <ListBoxItem IsSelected="{Binding Monday, Mode=TwoWay}" Content="Mon"/>
-                    <ListBoxItem IsSelected="{Binding Tuesday, Mode=TwoWay}" Content="Tue"/>
-                    <ListBoxItem IsSelected="{Binding Wednesday, Mode=TwoWay}" Content="Wed"/>
-                    <ListBoxItem IsSelected="{Binding Thursday, Mode=TwoWay}" Content="Thu"/>
-                    <ListBoxItem IsSelected="{Binding Friday, Mode=TwoWay}" Content="Fri"/>
-                    <ListBoxItem IsSelected="{Binding Saturday, Mode=TwoWay}" Content="Sat"/>
-                    <ListBoxItem IsSelected="{Binding Saturday, Mode=TwoWay}" Content="Sun"/>
+                
+                    <ListBoxItem Name="Mon" Content="Mon"/>
+                    <ListBoxItem Name="Tue" Content="Tue"/>
+                    <ListBoxItem Name="Wed" Content="Wed"/>
+                    <ListBoxItem Name="Thu" Content="Thu"/>
+                    <ListBoxItem Name="Fri" Content="Fri"/>
+                    <ListBoxItem Name="Sat" Content="Sat"/>
+                    <ListBoxItem Name="Sun" Content="Sun"/>
                 </ListBox>
                 
                 <Button HorizontalAlignment="Left"

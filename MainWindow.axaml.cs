@@ -2,7 +2,10 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Templates;
+using JetBrains.Annotations;
 
 namespace ZoomScheduler
 {
@@ -14,7 +17,7 @@ namespace ZoomScheduler
 #if DEBUG
             this.AttachDevTools();
 #endif
-
+            
             Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
             scheduleMeeting.Click += ScheduleMeeting_Button_OnClick;
         }
@@ -30,8 +33,12 @@ namespace ZoomScheduler
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
             TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
-            ListBox days = this.FindControl<ListBox>("MeetingDays");
-            //Todo: figure out days selected
+            ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
+
+            string[] lbNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+            int[] days = new int[lbNames.Length];
+            for (int i = 0; i < lbNames.Length; i++)
+                days[i] = this.FindControl<ListBoxItem>(lbNames[i]).IsSelected ? 1 : 0;
 
             ZoomMeeting meeting = new ZoomMeeting();
             if (!meeting.setName(info.Text))
@@ -42,12 +49,16 @@ namespace ZoomScheduler
                 ScheduleMeetingInvalidArg(password);
             if (!meeting.setTime(time.SelectedTime))
                 ScheduleMeetingInvalidArg(time);
-                
+            if (!meeting.setDays(days))
+                ScheduleMeetingInvalidArg(meetingDays);
+            
+            
+            //Save meeting in a json file if all args are correctly validated
         }
 
         private void ScheduleMeetingInvalidArg(object? sender)
         {
-            
+            //Red border around invalid arg?
         }
     }
 }

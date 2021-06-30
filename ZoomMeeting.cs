@@ -6,13 +6,16 @@ namespace ZoomScheduler
 {
     public class ZoomMeeting
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public ulong ID { get; set; }
-        public string Password { get; set; }
+        public string Password { get; set; } = "";
         public TimeSpan Time { get; set; }
-        public int[] Days { get; set; }
+        public int[] Days { get; set; } = new int[7];
 
-        public ZoomMeeting() { }
+        public ZoomMeeting()
+        {
+            
+        }
 
         public bool setName(string name)
         {
@@ -27,7 +30,7 @@ namespace ZoomScheduler
 
         public bool setId(string id)
         {
-            if (!ulong.TryParse(id, out ulong idLong))
+            if (ulong.TryParse(id, out ulong idLong))
             {
                 ID = idLong;
                 return true;
@@ -58,27 +61,15 @@ namespace ZoomScheduler
             return false;
         }
 
-        public bool setDays(WeekDays[] days)
+        public bool setDays(int[] days)
         {
-            int[] arr = days.Cast<int>().ToArray();
-            if (arr.Contains(1))
+            if (days.Contains(1))
             {
-                Days = arr;
+                Days = days;
                 return true;
             }
 
             return false;
         }
-    }
-
-    public enum WeekDays : int
-    {
-        Monday,
-        Tuesday,
-        Wednesday,
-        Thursday,
-        Friday,
-        Saturday,
-        Sunday
     }
 }
