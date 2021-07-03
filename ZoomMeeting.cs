@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace ZoomScheduler
 {
@@ -70,6 +73,34 @@ namespace ZoomScheduler
             }
 
             return false;
+        }
+
+        public static void SaveMeeting(ZoomMeeting meeting)
+        {
+            List<ZoomMeeting> meetings = ReadMeetings();
+            meetings ??= new List<ZoomMeeting>();
+            meetings.Add(meeting);
+            
+            string json = JsonConvert.SerializeObject(meetings);
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            Directory.CreateDirectory(path);
+            
+            using (FileStream fs = new FileStream(path + "\\Meetings.json", FileMode.Create, FileAccess.Write))
+            using (StreamWriter sw = new StreamWriter(fs)) 
+                sw.WriteLine(json);
+        }
+
+        public static List<ZoomMeeting> ReadMeetings()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            if (!Directory.Exists(path) || !File.Exists(path + "\\Meetings.json")) return null;
+
+            string json;
+            using (FileStream fs = new FileStream(path + "\\Meetings.json", FileMode.Open, FileAccess.Read))
+            using (StreamReader sr = new StreamReader(fs))
+                json = sr.ReadToEnd();
+
+            return JsonConvert.DeserializeObject<List<ZoomMeeting>>(json);
         }
     }
 }

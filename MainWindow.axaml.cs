@@ -52,8 +52,7 @@ namespace ZoomScheduler
             if (!meeting.setDays(days))
                 ScheduleMeetingInvalidArg(meetingDays);
             
-            
-            //Save meeting in a json file if all args are correctly validated
+            ZoomMeeting.SaveMeeting(meeting);
         }
 
         private void ScheduleMeetingInvalidArg(object? sender)
