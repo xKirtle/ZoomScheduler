@@ -75,7 +75,7 @@ namespace ZoomScheduler
             return false;
         }
 
-        public static void SaveMeeting(ZoomMeeting meeting)
+        public static void ScheduleMeeting(ZoomMeeting meeting)
         {
             List<ZoomMeeting> meetings = ReadMeetings();
             meetings ??= new List<ZoomMeeting>();
@@ -101,6 +101,21 @@ namespace ZoomScheduler
                 json = sr.ReadToEnd();
 
             return JsonConvert.DeserializeObject<List<ZoomMeeting>>(json);
+        }
+
+        public static void UnscheduleMeeting(int index)
+        {
+            List<ZoomMeeting> meetings = ReadMeetings();
+            meetings ??= new List<ZoomMeeting>();
+            meetings.RemoveAt(index);
+            
+            string json = JsonConvert.SerializeObject(meetings);
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            Directory.CreateDirectory(path);
+            
+            using (FileStream fs = new FileStream(path + "\\Meetings.json", FileMode.Create, FileAccess.Write))
+            using (StreamWriter sw = new StreamWriter(fs)) 
+                sw.WriteLine(json);
         }
     }
 }

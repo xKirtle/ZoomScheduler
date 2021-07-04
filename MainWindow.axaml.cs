@@ -18,12 +18,15 @@ namespace ZoomScheduler
 #if DEBUG
             this.AttachDevTools();
 #endif
-            
+
             Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
-            scheduleMeeting.Click += ScheduleMeeting_Button_OnClick;
+            scheduleMeeting.Click += ScheduleMeetingButton_OnClick;
 
             ComboBox unscheduleComboBox = this.FindControl<ComboBox>("UnscheduleMeeting_ComboBox");
             unscheduleComboBox.SelectionChanged += UnscheduleComboBox_OnSelectionChanged;
+            
+            Button unscheduleMeeting = this.FindControl<Button>("UnscheduleMeeting_Button");
+            unscheduleMeeting.Click += UnscheduleMeetingButton_OnClick;
             
             UpdateScheduledMeetings();
         }
@@ -33,7 +36,7 @@ namespace ZoomScheduler
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void ScheduleMeeting_Button_OnClick(object? sender, RoutedEventArgs e)
+        private void ScheduleMeetingButton_OnClick(object? sender, RoutedEventArgs e)
         {
             TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox");
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
@@ -58,9 +61,16 @@ namespace ZoomScheduler
             if (!meeting.setDays(days))
                 ScheduleMeetingInvalidArg(meetingDays);
             
-            ZoomMeeting.SaveMeeting(meeting);
+            ZoomMeeting.ScheduleMeeting(meeting);
             UpdateScheduledMeetings();
             ClearInputFields();
+        }
+        
+        private void UnscheduleMeetingButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            ComboBox unscheduleComboBox = this.FindControl<ComboBox>("UnscheduleMeeting_ComboBox");
+            ZoomMeeting.UnscheduleMeeting(unscheduleComboBox.SelectedIndex);
+            UpdateScheduledMeetings();
         }
 
         private void ScheduleMeetingInvalidArg(object? sender)
