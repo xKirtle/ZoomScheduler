@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -15,9 +17,9 @@ namespace ZoomScheduler
         public MainWindow()
         {
             InitializeComponent();
-#if DEBUG
+            #if DEBUG
             this.AttachDevTools();
-#endif
+            #endif
 
             Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
             scheduleMeeting.Click += ScheduleMeetingButton_OnClick;
@@ -42,6 +44,7 @@ namespace ZoomScheduler
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
             TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
+            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix");
             ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
 
             string[] lbNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -50,6 +53,7 @@ namespace ZoomScheduler
                 days[i] = this.FindControl<ListBoxItem>(lbNames[i]).IsSelected ? 1 : 0;
 
             ZoomMeeting meeting = new ZoomMeeting();
+            //TODO: Remove this spaghetti :(
             if (!meeting.setName(info.Text))
                 ScheduleMeetingInvalidArg(info);
             if (!meeting.setId(id.Text))
@@ -58,6 +62,8 @@ namespace ZoomScheduler
                 ScheduleMeetingInvalidArg(password);
             if (!meeting.setTime(time.SelectedTime))
                 ScheduleMeetingInvalidArg(time);
+            if (!meeting.setPrefix(prefix.IsChecked))
+                ScheduleMeetingInvalidArg(prefix);
             if (!meeting.setDays(days))
                 ScheduleMeetingInvalidArg(meetingDays);
             
@@ -69,8 +75,11 @@ namespace ZoomScheduler
         private void UnscheduleMeetingButton_OnClick(object? sender, RoutedEventArgs e)
         {
             ComboBox unscheduleComboBox = this.FindControl<ComboBox>("UnscheduleMeeting_ComboBox");
-            ZoomMeeting.UnscheduleMeeting(unscheduleComboBox.SelectedIndex);
-            UpdateScheduledMeetings();
+            if (unscheduleComboBox.ItemCount > 0)
+            {
+                ZoomMeeting.UnscheduleMeeting(unscheduleComboBox.SelectedIndex);
+                UpdateScheduledMeetings();
+            }
         }
 
         private void ScheduleMeetingInvalidArg(object? sender)
@@ -91,10 +100,12 @@ namespace ZoomScheduler
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
             TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
+            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix");
             ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
 
             info.Text = id.Text = password.Text = "";
             time.SelectedTime = TimeSpan.Zero;
+            prefix.IsChecked = false;
             meetingDays.SelectedItems = null;
         }
         
@@ -110,12 +121,14 @@ namespace ZoomScheduler
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox2");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox2");
             TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime2");
+            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix2");
             ListBox meetingDays = this.FindControl<ListBox>("MeetingDays2");
             
             info.Text = meeting.Name;
             id.Text = meeting.ID.ToString();
             password.Text = meeting.Password;
             time.SelectedTime = meeting.Time;
+            prefix.IsChecked = meeting.Prefix;
 
             List<ListBoxItem> selectedItems = new List<ListBoxItem>();
             string[] lbNames = {"Mon2", "Tue2", "Wed2", "Thu2", "Fri2", "Sat2", "Sun2"};

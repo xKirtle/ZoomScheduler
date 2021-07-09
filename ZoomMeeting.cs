@@ -14,6 +14,7 @@ namespace ZoomScheduler
         public string Password { get; set; } = "";
         public TimeSpan Time { get; set; }
         public int[] Days { get; set; } = new int[7];
+        public bool Prefix { get; set; }
 
         public ZoomMeeting()
         {
@@ -69,6 +70,17 @@ namespace ZoomScheduler
             if (days.Contains(1))
             {
                 Days = days;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool setPrefix(bool? prefix)
+        {
+            if (prefix != null)
+            {
+                Prefix = (bool)prefix;
                 return true;
             }
 
