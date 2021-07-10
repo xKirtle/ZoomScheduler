@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
@@ -17,29 +19,71 @@ namespace ZoomScheduler
 {
     public partial class MainWindow : Window
     {
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+        
+        private ZoomMeeting meetingToBeScheduled;
         public MainWindow()
         {
             InitializeComponent();
             #if DEBUG
             this.AttachDevTools();
             #endif
+
+            #region Schedule Meeting Tab
+            meetingToBeScheduled = new ZoomMeeting();
             
+            StackPanel scheduleSP = this.FindControl<StackPanel>("ScheduleSP");
+            ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
+            scheduleSP.LayoutUpdated += ScheduleSP_OnLayoutUpdated;
+            meetingDays.Tapped += ScheduleSP_OnLayoutUpdated;
+
             Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
             scheduleMeeting.Click += ScheduleMeetingButton_OnClick;
+            #endregion
 
+            #region Unschedule Meeting Tab
             ComboBox unscheduleComboBox = this.FindControl<ComboBox>("UnscheduleMeeting_ComboBox");
             unscheduleComboBox.SelectionChanged += UnscheduleComboBox_OnSelectionChanged;
             
             Button unscheduleMeeting = this.FindControl<Button>("UnscheduleMeeting_Button");
             unscheduleMeeting.Click += UnscheduleMeetingButton_OnClick;
+            #endregion
             
+            #region Settings Tab
             CheckBox startup = this.FindControl<CheckBox>("StartupCheckBox");
             startup.Tapped += StartupCheckBox_OnTapped;
             
             // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
             // CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
+            #endregion
             
             UpdateScheduledMeetings();
+        }
+
+        private void ScheduleSP_OnLayoutUpdated(object? sender, EventArgs e)
+        {
+            Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
+            TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox");
+            TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
+            TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
+            TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
+            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix");
+            ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
+            
+            string[] lbNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+            int[] days = new int[lbNames.Length];
+            for (int i = 0; i < lbNames.Length; i++)
+                days[i] = this.FindControl<ListBoxItem>(lbNames[i]).IsSelected ? 1 : 0;
+            
+            bool canSchedule = meetingToBeScheduled.setName(info.Text) && meetingToBeScheduled.setId(id.Text) &&
+                               meetingToBeScheduled.setPassword(password.Text) && meetingToBeScheduled.setTime(time.SelectedTime) &&
+                               meetingToBeScheduled.setPrefix(prefix.IsChecked) && meetingToBeScheduled.setDays(days);
+
+            scheduleMeeting.IsEnabled = canSchedule;
+            //TODO: Include visual feedback of which fields are incorrectly filled?
         }
 
         private void StartupCheckBox_OnTapped(object? sender, RoutedEventArgs e)
@@ -73,41 +117,10 @@ namespace ZoomScheduler
             //TODO: Save checkbox value in WPF Settings?
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-
         private void ScheduleMeetingButton_OnClick(object? sender, RoutedEventArgs e)
         {
-            TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox");
-            TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
-            TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
-            TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
-            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix");
-            ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
-
-            string[] lbNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-            int[] days = new int[lbNames.Length];
-            for (int i = 0; i < lbNames.Length; i++)
-                days[i] = this.FindControl<ListBoxItem>(lbNames[i]).IsSelected ? 1 : 0;
-
-            ZoomMeeting meeting = new ZoomMeeting();
-            //TODO: Remove this spaghetti :(
-            if (!meeting.setName(info.Text))
-                ScheduleMeetingInvalidArg(info);
-            if (!meeting.setId(id.Text))
-                ScheduleMeetingInvalidArg(id);
-            if (!meeting.setPassword(password.Text))
-                ScheduleMeetingInvalidArg(password);
-            if (!meeting.setTime(time.SelectedTime))
-                ScheduleMeetingInvalidArg(time);
-            if (!meeting.setPrefix(prefix.IsChecked))
-                ScheduleMeetingInvalidArg(prefix);
-            if (!meeting.setDays(days))
-                ScheduleMeetingInvalidArg(meetingDays);
-            
-            ZoomMeeting.ScheduleMeeting(meeting);
+            ZoomMeeting.ScheduleMeeting(meetingToBeScheduled);
+            meetingToBeScheduled = new ZoomMeeting();
             UpdateScheduledMeetings();
             ClearInputFields();
         }
@@ -120,12 +133,6 @@ namespace ZoomScheduler
                 ZoomMeeting.UnscheduleMeeting(unscheduleComboBox.SelectedIndex);
                 UpdateScheduledMeetings();
             }
-        }
-
-        private void ScheduleMeetingInvalidArg(object? sender)
-        {
-            //Red border around invalid arg?
-            //Disable schedule button?
         }
 
         private void UpdateScheduledMeetings()
@@ -152,10 +159,13 @@ namespace ZoomScheduler
         private void UnscheduleComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
-            UpdateScheduleMeetingValue(comboBox.SelectedIndex < 0 ? new ZoomMeeting() : ZoomMeeting.ReadMeetings()[comboBox.SelectedIndex]);
+            UpdateScheduledMeetingPreview(comboBox.SelectedIndex < 0 ? new ZoomMeeting() : ZoomMeeting.ReadMeetings()[comboBox.SelectedIndex]);
+            
+            Button unscheduleMeeting = this.FindControl<Button>("UnscheduleMeeting_Button");
+            unscheduleMeeting.IsEnabled = comboBox.SelectedIndex >= 0;
         }
 
-        private void UpdateScheduleMeetingValue(ZoomMeeting meeting)
+        private void UpdateScheduledMeetingPreview(ZoomMeeting meeting)
         {
             TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox2");
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox2");

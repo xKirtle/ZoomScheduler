@@ -45,13 +45,8 @@ namespace ZoomScheduler
 
         public bool setPassword(string password)
         {
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                Password = password;
-                return true;
-            }
-
-            return false;
+            Password = password == null ? "" : password;
+            return true;
         }
 
         public bool setTime(TimeSpan? time)

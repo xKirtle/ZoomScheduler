@@ -8,10 +8,9 @@
         Title="Zoom Scheduler"
         Icon="/Assets/icon.ico">
     
-    <!-- TODO: Why use 2 TabControls when UI is nearly identical? -->
     <TabControl Name="TabControl">
         <TabItem Header="Schedule Meeting" FontSize="21" VerticalContentAlignment="Center" Name="ScheduleTab">
-            <StackPanel>
+            <StackPanel Name="ScheduleSP">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -135,6 +134,7 @@
                             Content="Schedule Meeting"
                             Height="40"
                             VerticalContentAlignment="Center"
+                            IsEnabled="False"
                     />
                 </Grid>
             </StackPanel>
@@ -281,6 +281,7 @@
                         Content="Unschedule Meeting"
                         Height="40"
                         VerticalContentAlignment="Center"
+                        IsEnabled="False"
                 />
                 
             </StackPanel>
