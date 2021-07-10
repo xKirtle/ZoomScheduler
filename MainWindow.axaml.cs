@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Templates;
+using IWshRuntimeLibrary;
 using JetBrains.Annotations;
+using File = System.IO.File;
 
 namespace ZoomScheduler
 {
@@ -20,7 +23,7 @@ namespace ZoomScheduler
             #if DEBUG
             this.AttachDevTools();
             #endif
-
+            
             Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
             scheduleMeeting.Click += ScheduleMeetingButton_OnClick;
 
@@ -30,7 +33,44 @@ namespace ZoomScheduler
             Button unscheduleMeeting = this.FindControl<Button>("UnscheduleMeeting_Button");
             unscheduleMeeting.Click += UnscheduleMeetingButton_OnClick;
             
+            CheckBox startup = this.FindControl<CheckBox>("StartupCheckBox");
+            startup.Tapped += StartupCheckBox_OnTapped;
+            
+            // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
+            // CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
+            
             UpdateScheduledMeetings();
+        }
+
+        private void StartupCheckBox_OnTapped(object? sender, RoutedEventArgs e)
+        {
+            CheckBox startup = sender as CheckBox;
+            if (startup.IsChecked == true)
+            {
+                WshShell shell = new WshShell();
+                string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
+
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+                shortcut.Description = "ZoomScheduler";
+                shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                shortcut.WorkingDirectory = @"C:\Windows\System32";
+                shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
+                shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
+
+                shortcut.Save();
+                
+                //Execute dotnet pathToFile\file.dll
+                //Somewhat viable way for non Windows?
+                //TODO: Lookup multi platform compatibility solutions?
+            }
+            else
+            {
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
+            
+            //TODO: Save checkbox value in WPF Settings?
         }
 
         private void InitializeComponent()

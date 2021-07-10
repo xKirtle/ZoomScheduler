@@ -9,8 +9,8 @@
         Icon="/Assets/icon.ico">
     
     <!-- TODO: Why use 2 TabControls when UI is nearly identical? -->
-    <TabControl>
-        <TabItem Header="Schedule Meeting" FontSize="21" VerticalContentAlignment="Center">
+    <TabControl Name="TabControl">
+        <TabItem Header="Schedule Meeting" FontSize="21" VerticalContentAlignment="Center" Name="ScheduleTab">
             <StackPanel>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -291,50 +291,47 @@
                 <Image Source="Assets/cog-icon.ico" Width="45" Height="45"/>
             </TabItem.Header>
             
-            <!-- <TextBlock Margin="0 0 10 0" -->
-            <!--            Text=""  -->
-            <!--            VerticalAlignment="Stretch" -->
-            <!--            FontSize="16" -->
-            <!-- /> -->
-            
             <StackPanel>
-                <Separator Margin="0 11 0 10" 
-                           Height="1"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Bottom"                   
-                           Background="#0075d6"
-                />
                 <CheckBox Content="Run Zoom Scheduler on computer startup"
+                          Name="StartupCheckBox"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top"
                           FontSize="16"
-                          IsEnabled="False"
+                          IsEnabled="True"
                 />
-                
-                <Separator Margin="0 11 0 10" 
+                <Separator Margin="0 10 0 10" 
                            Height="1"
                            HorizontalAlignment="Stretch"
                            VerticalAlignment="Bottom"                   
                            Background="#0075d6"
                 />
+                
                 <CheckBox Content="Popup notifications confirming newly scheduled meetings"
+                          Name="PopUpNotificationsCheckBox"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top"
                           FontSize="16"
                           IsEnabled="False"
                 />
-                
-                <Separator Margin="0 11 0 10" 
+                <Separator Margin="0 10 0 10" 
                            Height="1"
                            HorizontalAlignment="Stretch"
                            VerticalAlignment="Bottom"                   
                            Background="#0075d6"
                 />
+                
                 <CheckBox Content="Minimize Zoom Scheduler to tray"
+                          Name="MinimizeToTrayCheckBox"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Top"
                           FontSize="16"
                           IsEnabled="False"
+                />
+                <Separator Margin="0 10 0 10" 
+                           Height="1"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Bottom"                   
+                           Background="#0075d6"
                 />
             </StackPanel>
             
