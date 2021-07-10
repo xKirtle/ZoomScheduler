@@ -10,7 +10,7 @@
     
     <!-- TODO: Why use 2 TabControls when UI is nearly identical? -->
     <TabControl>
-        <TabItem Header="Schedule Meeting" VerticalContentAlignment="Center">
+        <TabItem Header="Schedule Meeting" FontSize="21" VerticalContentAlignment="Center">
             <StackPanel>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -140,7 +140,7 @@
             </StackPanel>
         </TabItem>
         
-        <TabItem Header="Unschedule Meeting" VerticalContentAlignment="Center" Name="UnscheduleTab">
+        <TabItem Header="Unschedule Meeting" FontSize="21" VerticalContentAlignment="Center" Name="UnscheduleTab">
             <StackPanel>
                 <TextBlock Margin="0 5" Text="Choose a meeting to unschedule" FontSize="16"/>
                 <ComboBox Margin="0 5 0 0" 
@@ -284,6 +284,60 @@
                 />
                 
             </StackPanel>
+        </TabItem>
+        
+        <TabItem FontSize="20" VerticalContentAlignment="Center" Name="SettingsTab">
+            <TabItem.Header>
+                <Image Source="Assets/cog-icon.ico" Width="45" Height="45"/>
+            </TabItem.Header>
+            
+            <!-- <TextBlock Margin="0 0 10 0" -->
+            <!--            Text=""  -->
+            <!--            VerticalAlignment="Stretch" -->
+            <!--            FontSize="16" -->
+            <!-- /> -->
+            
+            <StackPanel>
+                <Separator Margin="0 11 0 10" 
+                           Height="1"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Bottom"                   
+                           Background="#0075d6"
+                />
+                <CheckBox Content="Run Zoom Scheduler on computer startup"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          FontSize="16"
+                          IsEnabled="False"
+                />
+                
+                <Separator Margin="0 11 0 10" 
+                           Height="1"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Bottom"                   
+                           Background="#0075d6"
+                />
+                <CheckBox Content="Popup notifications confirming newly scheduled meetings"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          FontSize="16"
+                          IsEnabled="False"
+                />
+                
+                <Separator Margin="0 11 0 10" 
+                           Height="1"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Bottom"                   
+                           Background="#0075d6"
+                />
+                <CheckBox Content="Minimize Zoom Scheduler to tray"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          FontSize="16"
+                          IsEnabled="False"
+                />
+            </StackPanel>
+            
         </TabItem>
     </TabControl>
 </Window>
