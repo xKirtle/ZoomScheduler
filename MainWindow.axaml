@@ -6,7 +6,17 @@
         Width="500" Height="520"
         x:Class="ZoomScheduler.MainWindow"
         Title="Zoom Scheduler"
-        Icon="/Assets/icon.ico">
+        Icon="/Assets/icon.ico"
+        CanResize="False">
+    
+    <Window.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="BorderBrush" Value="#0075d6"/>
+            <Setter Property="AcceptsTab" Value="False"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Styles>
     
     <TabControl Name="TabControl">
         <TabItem Header="Schedule Meeting" FontSize="21" VerticalContentAlignment="Center" Name="ScheduleTab">
@@ -41,10 +51,7 @@
                     <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                              Name="MeetingInfo_TextBox" 
                              Margin="0 5" 
-                             Height="45"
-                             AcceptsTab="False"
-                             VerticalContentAlignment="Center"
-                             BorderBrush="#0075d6"
+                             Watermark="What is this meeting about?"
                     />
                     
                     <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
@@ -55,10 +62,7 @@
                     <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                              Name="MeetingId_TextBox" 
                              Margin="0 5" 
-                             Height="45"
-                             AcceptsTab="False"
-                             VerticalContentAlignment="Center"
-                             BorderBrush="#0075d6"
+                             Watermark="The Zoom meeting ID"
                     />
                     
                     <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" 
@@ -69,10 +73,7 @@
                     <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
                              Name="MeetingPwd_TextBox" 
                              Margin="0 5" 
-                             Height="45" 
-                             AcceptsTab="False"
-                             VerticalContentAlignment="Center"
-                             BorderBrush="#0075d6"
+                             Watermark="The Zoom meeting password"
                     />
                     
                     <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
@@ -97,7 +98,7 @@
                     
                     <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3"
                                Margin="0 5" 
-                               Text="Press control to select multiple days!" 
+                               Text="Choose days to join meeting (Hold CTRL to select multiple)" 
                                FontSize="16"/>
                     <ListBox Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3" 
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -186,12 +187,7 @@
                                VerticalAlignment="Center"
                                FontSize="16"
                     />
-                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" 
-                             Name="MeetingInfo_TextBox2"
-                             Height="45"
-                             VerticalContentAlignment="Center"
-                             BorderBrush="#0075d6" 
-                    />
+                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Name="MeetingInfo_TextBox2"/>
                     
                     <TextBlock Grid.Row="2" Grid.Column="0" 
                                Margin="0 0 10 0"
@@ -206,12 +202,7 @@
                                FontSize="16"
                     />
                     
-                    <TextBox Grid.Row="3" Grid.Column="0"
-                             Name="MeetingId_TextBox2"
-                             Height="45"
-                             VerticalContentAlignment="Center"
-                             BorderBrush="#0075d6" 
-                    />
+                    <TextBox Grid.Row="3" Grid.Column="0" Name="MeetingId_TextBox2"/>
                     <TextBox Grid.Row="3" Grid.Column="2" 
                              Name="MeetingPwd_TextBox2"
                              Height="45"
@@ -335,7 +326,6 @@
                            Background="#0075d6"
                 />
             </StackPanel>
-            
         </TabItem>
     </TabControl>
 </Window>

@@ -1,18 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Templates;
 using IWshRuntimeLibrary;
-using JetBrains.Annotations;
 using File = System.IO.File;
 
 namespace ZoomScheduler
@@ -40,6 +33,9 @@ namespace ZoomScheduler
             scheduleSP.LayoutUpdated += ScheduleSP_OnLayoutUpdated;
             meetingDays.Tapped += ScheduleSP_OnLayoutUpdated;
 
+            TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
+            id.KeyDown += Id_OnKeyDown;
+
             Button scheduleMeeting = this.FindControl<Button>("ScheduleMeeting_Button");
             scheduleMeeting.Click += ScheduleMeetingButton_OnClick;
             #endregion
@@ -61,6 +57,16 @@ namespace ZoomScheduler
             #endregion
             
             UpdateScheduledMeetings();
+        }
+
+        private void Id_OnKeyDown(object? sender, KeyEventArgs e)
+        {
+            //Happens before e.Key is added to the textbox
+            
+            string text = ((TextBox) sender).Text;
+            Console.WriteLine(e.Key);
+            
+            //TODO: apply regex here?
         }
 
         private void ScheduleSP_OnLayoutUpdated(object? sender, EventArgs e)
