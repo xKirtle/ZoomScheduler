@@ -1,29 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using IWshRuntimeLibrary;
+using Newtonsoft.Json;
 using File = System.IO.File;
 
 namespace ZoomScheduler
 {
     public partial class MainWindow : Window
     {
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-        
         private ZoomMeeting meetingToBeScheduled;
+        private bool isPointerPressed = false;
+        private PixelPoint startPosition = new PixelPoint(0, 0);
+        private Point mouseOffsetToOrigin = new Point(0, 0);
+        private List<CheckBox> settingsCheckBoxes;
         public MainWindow()
         {
-            InitializeComponent();
-            #if DEBUG
-            this.AttachDevTools();
-            #endif
+            AvaloniaXamlLoader.Load(this);
+            this.Opened += OnOpened;
+            this.Closing += OnClosing;
 
             #region Schedule Meeting Tab
             meetingToBeScheduled = new ZoomMeeting();
@@ -49,14 +50,47 @@ namespace ZoomScheduler
             #endregion
             
             #region Settings Tab
+
+            settingsCheckBoxes = new List<CheckBox>();
             CheckBox startup = this.FindControl<CheckBox>("StartupCheckBox");
-            startup.Tapped += StartupCheckBox_OnTapped;
-            
+            startup.Tapped += (__, _) => StartupOnSystemBoot((bool)startup.IsChecked);
+            settingsCheckBoxes.Add(startup);
+
             // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
             // CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
             #endregion
             
             UpdateScheduledMeetings();
+        }
+
+        private void OnOpened(object? sender, EventArgs e)
+        {
+            //Load CheckBoxes values in the Settings
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            if (!Directory.Exists(path) || !File.Exists(path + "\\Settings.json")) return;
+
+            string json;
+            using (FileStream fs = new FileStream(path + "\\Settings.json", FileMode.Open, FileAccess.Read))
+            using (StreamReader sr = new StreamReader(fs))
+                json = sr.ReadToEnd();
+
+            bool[] options = JsonConvert.DeserializeObject<bool[]>(json);
+
+            for (int i = 0; i < settingsCheckBoxes.Count; i++)
+                settingsCheckBoxes[i].IsChecked = options[i];
+        }
+
+        private void OnClosing(object? sender, CancelEventArgs e)
+        {
+            //Save CheckBoxes values in the Settings
+            bool[] options = new bool[settingsCheckBoxes.Count];
+            string json = JsonConvert.SerializeObject(options);
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            Directory.CreateDirectory(path);
+            
+            using (FileStream fs = new FileStream(path + "\\Settings.json", FileMode.Create, FileAccess.Write))
+            using (StreamWriter sw = new StreamWriter(fs)) 
+                sw.WriteLine(json);
         }
 
         private void Id_OnKeyDown(object? sender, KeyEventArgs e)
@@ -92,10 +126,9 @@ namespace ZoomScheduler
             //TODO: Include visual feedback of which fields are incorrectly filled?
         }
 
-        private void StartupCheckBox_OnTapped(object? sender, RoutedEventArgs e)
+        private void StartupOnSystemBoot(bool isEnabled)
         {
-            CheckBox startup = sender as CheckBox;
-            if (startup.IsChecked == true)
+            if (isEnabled)
             {
                 WshShell shell = new WshShell();
                 string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
@@ -120,7 +153,7 @@ namespace ZoomScheduler
                     File.Delete(path);
             }
             
-            //TODO: Save checkbox value in WPF Settings?
+            //TODO: Save checkbox value in a JSON Settings File
         }
 
         private void ScheduleMeetingButton_OnClick(object? sender, RoutedEventArgs e)

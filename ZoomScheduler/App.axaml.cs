@@ -21,14 +21,17 @@ namespace ZoomScheduler
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+
+            //To get which OS is this app running on
+            //AvaloniaLocator.Current.GetService<IRuntimePlatform>().GetRuntimeInfo().OperatingSystem;
+            
+            //TODO: Launch ZoomSchedulerService here
         }
 
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
                 desktop.MainWindow = new MainWindow();
-            }
 
             base.OnFrameworkInitializationCompleted();
         }
