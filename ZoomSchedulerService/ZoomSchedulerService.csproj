@@ -1,23 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
-        <UserSecretsId>dotnet-ZoomSchedulerService-52FB6779-BE07-47F6-B729-46C900BA543D</UserSecretsId>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>C:\Users\Kirtle\RiderProjects\ZoomScheduler\ZoomScheduler\bin\Debug</OutputPath>
+      <OutputPath>..\ZoomScheduler\bin\Debug\</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>C:\Users\Kirtle\RiderProjects\ZoomScheduler\ZoomScheduler\bin\Release</OutputPath>
+      <OutputPath>..\ZoomScheduler\bin\Release\</OutputPath>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ZoomScheduler\ZoomScheduler.csproj" />
     </ItemGroup>
+
 </Project>

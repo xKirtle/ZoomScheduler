@@ -1,21 +1,37 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using ZoomScheduler;
 
 namespace ZoomSchedulerService
 {
-    public class Program
+    class Program
     {
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            while (true)
+            {
+                List<ZoomMeeting> meetings = ZoomMeeting.ReadMeetings();
+                foreach (ZoomMeeting meeting in meetings)
+                {
+                    string meetingTime = $"{meetings[0].Time.Hours}:{meetings[0].Time.Minutes}";
+                    string currentTime = DateTime.Now.ToString("HH:mm");
+                    int dayOfWeek = ((int)DateTime.Today.DayOfWeek + 6) % 7; //DayOfWeek enum starts on a Sunday...
+                    
+                    if (meeting.Days[dayOfWeek] == 1 && meetingTime == currentTime)
+                    {
+                        string url = $"https://{(meeting.Prefix ? "videoconf-colibri." : "")}zoom.us/j/{meeting.ID}?pwd={meeting.Password}";
+                        Process.Start(new ProcessStartInfo()
+                        {
+                            FileName = url,
+                            UseShellExecute = true
+                        });
+                    }
+                }
+                Thread.Sleep(1000 * 60);
+            }
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) => { services.AddHostedService<Worker>(); });
     }
 }

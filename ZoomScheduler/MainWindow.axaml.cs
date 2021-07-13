@@ -16,9 +16,6 @@ namespace ZoomScheduler
     public partial class MainWindow : Window
     {
         private ZoomMeeting meetingToBeScheduled;
-        private bool isPointerPressed = false;
-        private PixelPoint startPosition = new PixelPoint(0, 0);
-        private Point mouseOffsetToOrigin = new Point(0, 0);
         private List<CheckBox> settingsCheckBoxes;
         public MainWindow()
         {
