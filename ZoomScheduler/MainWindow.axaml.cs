@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using IWshRuntimeLibrary;
 using Newtonsoft.Json;
 using File = System.IO.File;
@@ -125,32 +126,41 @@ namespace ZoomScheduler
 
         private void StartupOnSystemBoot(bool isEnabled)
         {
-            if (isEnabled)
+            //TODO: Lookup multi platform compatibility solutions?
+            
+            switch (App.OSType)
             {
-                WshShell shell = new WshShell();
-                string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
-
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-                shortcut.Description = "ZoomScheduler";
-                shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                shortcut.WorkingDirectory = @"C:\Windows\System32";
-                shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
-                shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
-
-                shortcut.Save();
+                case OperatingSystemType.WinNT:
+                    Windows();
+                    break;
                 
-                //Execute dotnet pathToFile\file.dll
-                //Somewhat viable way for non Windows?
-                //TODO: Lookup multi platform compatibility solutions?
-            }
-            else
-            {
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
-                if (File.Exists(path))
-                    File.Delete(path);
+                default:
+                    break;
             }
             
-            //TODO: Save checkbox value in a JSON Settings File
+            void Windows()
+            {
+                if (isEnabled)
+                {
+                    WshShell shell = new WshShell();
+                    string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
+
+                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+                    shortcut.Description = "ZoomScheduler";
+                    shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    shortcut.WorkingDirectory = @"C:\Windows\System32";
+                    shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
+                    shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
+
+                    shortcut.Save();
+                }
+                else
+                {
+                    string path = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
+                    if (File.Exists(path))
+                        File.Delete(path);
+                }
+            }
         }
 
         private void ScheduleMeetingButton_OnClick(object? sender, RoutedEventArgs e)

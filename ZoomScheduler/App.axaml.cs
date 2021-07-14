@@ -1,11 +1,16 @@
+using System;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 
 namespace ZoomScheduler
 {
     public class App : Application
     {
+        public static OperatingSystemType OSType;
+        
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
@@ -23,9 +28,19 @@ namespace ZoomScheduler
             AvaloniaXamlLoader.Load(this);
 
             //To get which OS is this app running on
-            //AvaloniaLocator.Current.GetService<IRuntimePlatform>().GetRuntimeInfo().OperatingSystem;
+            OSType = AvaloniaLocator.Current.GetService<IRuntimePlatform>().GetRuntimeInfo().OperatingSystem;
+
+            //Launch the service
+            switch (OSType)
+            {
+                case OperatingSystemType.WinNT:
+                    Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe");
+                    break;
+                
+                default:
+                    break;
+            }
             
-            //TODO: Launch ZoomSchedulerService here
         }
 
         public override void OnFrameworkInitializationCompleted()
