@@ -65,11 +65,11 @@ namespace ZoomScheduler
         private void OnOpened(object? sender, EventArgs e)
         {
             //Load CheckBoxes values in the Settings
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
-            if (!Directory.Exists(path) || !File.Exists(path + "\\Settings.json")) return;
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
+            if (!Directory.Exists(path) || !File.Exists(Path.Combine(path, "Settings.json"))) return;
 
             string json;
-            using (FileStream fs = new FileStream(path + "\\Settings.json", FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(Path.Combine(path, "Settings.json"), FileMode.Open, FileAccess.Read))
             using (StreamReader sr = new StreamReader(fs))
                 json = sr.ReadToEnd();
 
@@ -84,10 +84,10 @@ namespace ZoomScheduler
             //Save CheckBoxes values in the Settings
             bool[] options = new bool[settingsCheckBoxes.Count];
             string json = JsonConvert.SerializeObject(options);
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
             Directory.CreateDirectory(path);
             
-            using (FileStream fs = new FileStream(path + "\\Settings.json", FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new FileStream(Path.Combine(path, "Settings.json"), FileMode.Create, FileAccess.Write))
             using (StreamWriter sw = new StreamWriter(fs)) 
                 sw.WriteLine(json);
         }
@@ -145,11 +145,11 @@ namespace ZoomScheduler
                 {
                     string basePath = AppDomain.CurrentDomain.BaseDirectory;
                     WshInterop.CreateShortcut(basePath, "ZoomSchedulerService", 
-                        basePath + @"\ZoomSchedulerService.exe", "", basePath + @"Assets\icon.ico");
+                        Path.Combine(basePath, "ZoomSchedulerService.exe"), "", Path.Combine(basePath, "Assets\\icon.ico"));
                 }
                 else
                 {
-                    string path = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
+                    string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "ZoomSchedulerService.lnk");
                     if (File.Exists(path))
                         File.Delete(path);
                 }

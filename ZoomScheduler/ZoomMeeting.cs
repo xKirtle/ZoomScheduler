@@ -89,21 +89,21 @@ namespace ZoomScheduler
             meetings.Add(meeting);
             
             string json = JsonConvert.SerializeObject(meetings);
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
             Directory.CreateDirectory(path);
             
-            using (FileStream fs = new FileStream(path + "\\Meetings.json", FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new FileStream(Path.Combine(path, "Meetings.json"), FileMode.Create, FileAccess.Write))
             using (StreamWriter sw = new StreamWriter(fs)) 
                 sw.WriteLine(json);
         }
 
         public static List<ZoomMeeting> ReadMeetings()
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
-            if (!Directory.Exists(path) || !File.Exists(path + "\\Meetings.json")) return null;
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
+            if (!Directory.Exists(path) || !File.Exists(Path.Combine(path, "Meetings.json"))) return null;
 
             string json;
-            using (FileStream fs = new FileStream(path + "\\Meetings.json", FileMode.Open, FileAccess.Read))
+            using (FileStream fs = new FileStream(Path.Combine(path, "Meetings.json"), FileMode.Open, FileAccess.Read))
             using (StreamReader sr = new StreamReader(fs))
                 json = sr.ReadToEnd();
 
@@ -117,10 +117,10 @@ namespace ZoomScheduler
             meetings.RemoveAt(index);
             
             string json = JsonConvert.SerializeObject(meetings);
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\ZoomScheduler";
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
             Directory.CreateDirectory(path);
             
-            using (FileStream fs = new FileStream(path + "\\Meetings.json", FileMode.Create, FileAccess.Write))
+            using (FileStream fs = new FileStream(Path.Combine(path, "Meetings.json"), FileMode.Create, FileAccess.Write))
             using (StreamWriter sw = new StreamWriter(fs)) 
                 sw.WriteLine(json);
         }
