@@ -9,8 +9,15 @@ namespace ZoomSchedulerService
 {
     class Program
     {
+        private static Mutex mutex = null;
         static void Main(string[] args)
         {
+            //Prevent multiple instances running
+            bool singleInstance;
+            mutex = new Mutex(true, "ZoomSchedulerService", out singleInstance);
+            if (!singleInstance)
+                Environment.Exit(0);
+            
             while (true)
             {
                 List<ZoomMeeting> meetings = ZoomMeeting.ReadMeetings();
