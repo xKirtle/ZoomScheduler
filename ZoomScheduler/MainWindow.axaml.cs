@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using DK.WshRuntime;
 using IWshRuntimeLibrary;
 using Newtonsoft.Json;
 using File = System.IO.File;
@@ -137,22 +138,14 @@ namespace ZoomScheduler
                 default:
                     break;
             }
-            
+
             void Windows()
             {
                 if (isEnabled)
                 {
-                    WshShell shell = new WshShell();
-                    string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
-
-                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-                    shortcut.Description = "ZoomScheduler";
-                    shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    shortcut.WorkingDirectory = @"C:\Windows\System32";
-                    shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
-                    shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
-
-                    shortcut.Save();
+                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    WshInterop.CreateShortcut(basePath, "ZoomSchedulerService", 
+                        basePath + @"\ZoomSchedulerService.exe", "", basePath + @"Assets\icon.ico");
                 }
                 else
                 {
