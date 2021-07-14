@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -127,7 +128,7 @@ namespace ZoomScheduler
 
         private void StartupOnSystemBoot(bool isEnabled)
         {
-            //TODO: Lookup multi platform compatibility solutions?
+            //TODO: Make a standalone console app that requires elevated perms
             
             switch (App.OSType)
             {
@@ -135,10 +136,42 @@ namespace ZoomScheduler
                     Windows();
                     break;
                 
+                case OperatingSystemType.Linux:
+                    Linux();
+                    break;
+                
                 default:
                     break;
             }
 
+            void Linux()
+            {
+                if (isEnabled)
+                {
+                    //Copy startupScript.sh to /usr/bin and make sure it can execute it (chmod +X)
+                    //TODO: /usr/bin requires admin permissions so I just used the config folder for now
+                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    string fileContent = $"dotnet {basePath}ZoomSchedulerService.dll";
+                    string scriptPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+                        "ZoomScheduler/startZoomSchedulerOnBoot.sh");
+                    
+                    using (FileStream fs = new FileStream(scriptPath, FileMode.Create, FileAccess.Write))
+                    using (StreamWriter sw = new StreamWriter(fs)) 
+                        sw.WriteLine(fileContent);
+
+                    string cmd = $"chmod +x {scriptPath}";
+                    Process.Start("/bin/bash", $"-c \"{cmd}\"").WaitForExit();
+                    
+                    //Create unit file to define a systemd service in /lib/systemd/system/{$serviceName}.service
+                    
+                    //sudo systemctl enable {$serviceName}
+                }
+                else
+                {
+                    
+                }
+            }
+            
             void Windows()
             {
                 if (isEnabled)
