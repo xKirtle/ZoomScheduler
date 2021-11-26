@@ -4,23 +4,32 @@
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <OutputPath>..\bin\Debug\</OutputPath>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <OutputPath>..\bin\Release\</OutputPath>
+    </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.3" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.3" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.3" />
+        <PackageReference Include="Avalonia" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.10" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
-    <ItemGroup>
-      <COMReference Include="IWshRuntimeLibrary.dll">
-        <WrapperTool>tlbimp</WrapperTool>
-        <VersionMinor>0</VersionMinor>
-        <VersionMajor>1</VersionMajor>
-        <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
-        <Lcid>0</Lcid>
-        <Isolated>true</Isolated>
-      </COMReference>
-    </ItemGroup>
+    
+<!--    Broken...-->
+<!--    <ItemGroup>-->
+<!--      <COMReference Include="IWshRuntimeLibrary.dll">-->
+<!--        <WrapperTool>tlbimp</WrapperTool>-->
+<!--        <VersionMinor>0</VersionMinor>-->
+<!--        <VersionMajor>1</VersionMajor>-->
+<!--        <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>-->
+<!--        <Lcid>0</Lcid>-->
+<!--        <Isolated>true</Isolated>-->
+<!--      </COMReference>-->
+<!--    </ItemGroup>-->
 </Project>

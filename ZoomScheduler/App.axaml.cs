@@ -37,6 +37,12 @@ namespace ZoomScheduler
                     Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe");
                     break;
                 
+                case OperatingSystemType.Linux:
+                    break;
+                
+                case OperatingSystemType.OSX:
+                    break;
+                
                 default:
                     break;
             }

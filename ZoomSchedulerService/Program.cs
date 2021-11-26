@@ -23,7 +23,7 @@ namespace ZoomSchedulerService
                 List<ZoomMeeting> meetings = ZoomMeeting.ReadMeetings();
                 foreach (ZoomMeeting meeting in meetings)
                 {
-                    string meetingTime = $"{meetings[0].Time.Hours}:{meetings[0].Time.Minutes}";
+                    string meetingTime = $"{meeting.Time.ToString(@"hh\:mm")}";
                     string currentTime = DateTime.Now.ToString("HH:mm");
                     int dayOfWeek = ((int)DateTime.Today.DayOfWeek + 6) % 7; //DayOfWeek enum starts on a Sunday...
                     

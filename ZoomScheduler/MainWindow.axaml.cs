@@ -8,7 +8,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
-using IWshRuntimeLibrary;
 using Newtonsoft.Json;
 using File = System.IO.File;
 
@@ -18,6 +17,7 @@ namespace ZoomScheduler
     {
         private ZoomMeeting meetingToBeScheduled;
         private List<CheckBox> settingsCheckBoxes;
+        
         public MainWindow()
         {
             AvaloniaXamlLoader.Load(this);
@@ -146,23 +146,23 @@ namespace ZoomScheduler
             {
                 if (isEnabled)
                 {
-                    //Copy startupScript.sh to /usr/bin and make sure it can execute it (chmod +X)
-                    //TODO: /usr/bin requires admin permissions so I just used the config folder for now
-                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                    string fileContent = $"dotnet {basePath}ZoomSchedulerService.dll";
-                    string scriptPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
-                        "ZoomScheduler/startZoomSchedulerOnBoot.sh");
-                    
-                    using (FileStream fs = new FileStream(scriptPath, FileMode.Create, FileAccess.Write))
-                    using (StreamWriter sw = new StreamWriter(fs)) 
-                        sw.WriteLine(fileContent);
-
-                    string cmd = $"chmod +x {scriptPath}";
-                    Process.Start("/bin/bash", $"-c \"{cmd}\"").WaitForExit();
-                    
-                    //Create unit file to define a systemd service in /lib/systemd/system/{$serviceName}.service
-                    
-                    //sudo systemctl enable {$serviceName}
+                    // //Copy startupScript.sh to /usr/bin and make sure it can execute it (chmod +X)
+                    // //TODO: /usr/bin requires admin permissions so I just used the config folder for now
+                    // string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    // string fileContent = $"dotnet {basePath}ZoomSchedulerService.dll";
+                    // string scriptPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+                    //     "ZoomScheduler/startZoomSchedulerOnBoot.sh");
+                    //
+                    // using (FileStream fs = new FileStream(scriptPath, FileMode.Create, FileAccess.Write))
+                    // using (StreamWriter sw = new StreamWriter(fs)) 
+                    //     sw.WriteLine(fileContent);
+                    //
+                    // string cmd = $"chmod +x {scriptPath}";
+                    // Process.Start("/bin/bash", $"-c \"{cmd}\"").WaitForExit();
+                    //
+                    // //Create unit file to define a systemd service in /lib/systemd/system/{$serviceName}.service
+                    //
+                    // //sudo systemctl enable {$serviceName}
                 }
                 else
                 {
@@ -172,25 +172,27 @@ namespace ZoomScheduler
             
             void Windows()
             {
-                if (isEnabled)
-                {
-                    WshShell shell = new WshShell();
-                    string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
-
-                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-                    shortcut.Description = "ZoomScheduler";
-                    shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
-                    shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
-
-                    shortcut.Save();
-                }
-                else
-                {
-                    string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "ZoomSchedulerService.lnk");
-                    if (File.Exists(path))
-                        File.Delete(path);
-                }
+                //Create shortcut linking to the service exe in shell:startup
+                
+                // if (isEnabled)
+                // {
+                //     WshShell shell = new WshShell();
+                //     string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
+                //
+                //     IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
+                //     shortcut.Description = "ZoomScheduler";
+                //     shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                //     shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
+                //     shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
+                //
+                //     shortcut.Save();
+                // }
+                // else
+                // {
+                //     string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "ZoomSchedulerService.lnk");
+                //     if (File.Exists(path))
+                //         File.Delete(path);
+                // }
             }
         }
 
