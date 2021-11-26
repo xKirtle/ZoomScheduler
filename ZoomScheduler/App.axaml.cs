@@ -34,7 +34,7 @@ namespace ZoomScheduler
             switch (OSType)
             {
                 case OperatingSystemType.WinNT:
-                    Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe");
+                    //Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe");
                     break;
                 
                 case OperatingSystemType.Linux:

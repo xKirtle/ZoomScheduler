@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using File = System.IO.File;
 
@@ -48,17 +50,36 @@ namespace ZoomScheduler
             #endregion
             
             #region Settings Tab
-
+            //TODO: Read and update settings from Settings.json in Roaming? 
             settingsCheckBoxes = new List<CheckBox>();
             CheckBox startup = this.FindControl<CheckBox>("StartupCheckBox");
             startup.Tapped += (__, _) => StartupOnSystemBoot((bool)startup.IsChecked);
             settingsCheckBoxes.Add(startup);
 
             // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
-            // CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
+            CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
             #endregion
             
             UpdateScheduledMeetings();
+            
+            TrayIcon trayIcon = new TrayIcon();
+            trayIcon.Icon = new WindowIcon("Assets\\icon.ico");
+            trayIcon.IsVisible = false;
+            trayIcon.Clicked += (sender, args) =>
+            {
+                this.WindowState = WindowState.Normal;
+                this.Show();
+                trayIcon.IsVisible = false;
+            };
+
+            this.PropertyChanged += (sender, args) =>
+            {
+                if (minimizeToTray.IsChecked.Value && WindowState == WindowState.Minimized)
+                {
+                    this.Hide();
+                    trayIcon.IsVisible = true;
+                }
+            };
         }
 
         private void OnOpened(object? sender, EventArgs e)
@@ -172,27 +193,15 @@ namespace ZoomScheduler
             
             void Windows()
             {
-                //Create shortcut linking to the service exe in shell:startup
-                
-                // if (isEnabled)
-                // {
-                //     WshShell shell = new WshShell();
-                //     string shortcutAddress = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + @"\ZoomSchedulerService.lnk";
-                //
-                //     IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutAddress);
-                //     shortcut.Description = "ZoomScheduler";
-                //     shortcut.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                //     shortcut.TargetPath = AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe";
-                //     shortcut.IconLocation = AppDomain.CurrentDomain.BaseDirectory + @"Assets\icon.ico";
-                //
-                //     shortcut.Save();
-                // }
-                // else
-                // {
-                //     string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "ZoomSchedulerService.lnk");
-                //     if (File.Exists(path))
-                //         File.Delete(path);
-                // }
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey
+                    ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce", true);
+
+                if (isEnabled)
+                    rk.SetValue("ZoomSchedulerService", AppDomain.CurrentDomain.BaseDirectory);
+                else
+                    rk.DeleteValue("ZoomSchedulerService",false);
+
+                //Create shortcut linking to the service exe in shell:startup?
             }
         }
 
