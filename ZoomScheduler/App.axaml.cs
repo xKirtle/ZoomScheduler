@@ -26,27 +26,9 @@ namespace ZoomScheduler
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
-
+            
             //To get which OS is this app running on
             OSType = AvaloniaLocator.Current.GetService<IRuntimePlatform>().GetRuntimeInfo().OperatingSystem;
-
-            //Launch the service
-            switch (OSType)
-            {
-                case OperatingSystemType.WinNT:
-                    //Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"\ZoomSchedulerService.exe");
-                    break;
-                
-                case OperatingSystemType.Linux:
-                    break;
-                
-                case OperatingSystemType.OSX:
-                    break;
-                
-                default:
-                    break;
-            }
-            
         }
 
         public override void OnFrameworkInitializationCompleted()

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Runtime.Versioning;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -53,11 +55,12 @@ namespace ZoomScheduler
             //TODO: Read and update settings from Settings.json in Roaming? 
             settingsCheckBoxes = new List<CheckBox>();
             CheckBox startup = this.FindControl<CheckBox>("StartupCheckBox");
-            startup.Tapped += (__, _) => StartupOnSystemBoot((bool)startup.IsChecked);
+            startup.Tapped += (__, _) => StartupOnSystemBoot(startup.IsChecked ?? false);
             settingsCheckBoxes.Add(startup);
 
             // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
             CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
+            settingsCheckBoxes.Add(minimizeToTray);
             #endregion
             
             UpdateScheduledMeetings();
@@ -74,7 +77,7 @@ namespace ZoomScheduler
 
             this.PropertyChanged += (sender, args) =>
             {
-                if (minimizeToTray.IsChecked.Value && WindowState == WindowState.Minimized)
+                if ((minimizeToTray.IsChecked ?? false) && WindowState == WindowState.Minimized)
                 {
                     this.Hide();
                     trayIcon.IsVisible = true;
@@ -93,16 +96,24 @@ namespace ZoomScheduler
             using (StreamReader sr = new StreamReader(fs))
                 json = sr.ReadToEnd();
 
-            bool[] options = JsonConvert.DeserializeObject<bool[]>(json);
-
+            bool[] options = JsonConvert.DeserializeObject<bool[]>(json) ?? new bool[settingsCheckBoxes.Count];
             for (int i = 0; i < settingsCheckBoxes.Count; i++)
                 settingsCheckBoxes[i].IsChecked = options[i];
+            
+            //Check "run zoom scheduler on startup" based on registryKey values
+            if (OperatingSystem.IsWindows())
+            {
+                #pragma warning disable
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey
+                    ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce", false);
+                settingsCheckBoxes[0].IsChecked = rk.GetValue("ZoomSchedulerService") != null;
+            }
         }
 
         private void OnClosing(object? sender, CancelEventArgs e)
         {
             //Save CheckBoxes values in the Settings
-            bool[] options = new bool[settingsCheckBoxes.Count];
+            System.Nullable<bool>[] options = settingsCheckBoxes.Select(x => x.IsChecked).ToArray();
             string json = JsonConvert.SerializeObject(options);
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
             Directory.CreateDirectory(path);
@@ -128,8 +139,9 @@ namespace ZoomScheduler
             TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox");
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
-            TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
-            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix");
+            TextBox prefix = this.FindControl<TextBox>("MeetingPrefix_TextBox");
+            TimePicker startTime = this.FindControl<TimePicker>("MeetingStartTime");
+            TimePicker endTime = this.FindControl<TimePicker>("MeetingEndTime");
             ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
             
             string[] lbNames = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
@@ -138,8 +150,9 @@ namespace ZoomScheduler
                 days[i] = this.FindControl<ListBoxItem>(lbNames[i]).IsSelected ? 1 : 0;
             
             bool canSchedule = meetingToBeScheduled.setName(info.Text) && meetingToBeScheduled.setId(id.Text) &&
-                               meetingToBeScheduled.setPassword(password.Text) && meetingToBeScheduled.setTime(time.SelectedTime) &&
-                               meetingToBeScheduled.setPrefix(prefix.IsChecked) && meetingToBeScheduled.setDays(days);
+                               meetingToBeScheduled.setPassword(password.Text) && meetingToBeScheduled.setPrefix(prefix.Text) &&
+                               meetingToBeScheduled.setStartTime(startTime.SelectedTime) && meetingToBeScheduled.setEndTime(endTime.SelectedTime) && 
+                               meetingToBeScheduled.setPrefix(prefix.Text) && meetingToBeScheduled.setDays(days);
 
             scheduleMeeting.IsEnabled = canSchedule;
             //TODO: Include visual feedback of which fields are incorrectly filled?
@@ -147,22 +160,26 @@ namespace ZoomScheduler
 
         private void StartupOnSystemBoot(bool isEnabled)
         {
-            //TODO: Make a standalone console app that requires elevated perms
+            // switch (App.OSType)
+            // {
+            //     case OperatingSystemType.WinNT:
+            //         Windows();
+            //         break;
+            //     
+            //     case OperatingSystemType.Linux:
+            //         Linux();
+            //         break;
+            //     
+            //     default:
+            //         break;
+            // }
             
-            switch (App.OSType)
-            {
-                case OperatingSystemType.WinNT:
-                    Windows();
-                    break;
-                
-                case OperatingSystemType.Linux:
-                    Linux();
-                    break;
-                
-                default:
-                    break;
-            }
+            if (OperatingSystem.IsLinux())
+                Linux();
+            else if (OperatingSystem.IsWindows())
+                Windows();
 
+            [SupportedOSPlatform("linux")]
             void Linux()
             {
                 if (isEnabled)
@@ -190,14 +207,17 @@ namespace ZoomScheduler
                     
                 }
             }
-            
+            [SupportedOSPlatform("windows")]
             void Windows()
             {
-                RegistryKey rk = Registry.CurrentUser.OpenSubKey
-                    ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce", true);
+                //TODO: Make a standalone console app that requires elevated perms to do this task?
 
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey
+                    ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                if (rk == null) return;
+                
                 if (isEnabled)
-                    rk.SetValue("ZoomSchedulerService", AppDomain.CurrentDomain.BaseDirectory);
+                    rk.SetValue("ZoomSchedulerService", Path.Combine(Environment.CurrentDirectory, "ZoomSchedulerService.exe"));
                 else
                     rk.DeleteValue("ZoomSchedulerService",false);
 
@@ -234,13 +254,13 @@ namespace ZoomScheduler
             TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox");
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox");
-            TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime");
-            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix");
+            TextBox prefix = this.FindControl<TextBox>("MeetingPrefix_TextBox");
+            TimePicker startTime = this.FindControl<TimePicker>("MeetingStartTime");
+            TimePicker endTime = this.FindControl<TimePicker>("MeetingEndTime");
             ListBox meetingDays = this.FindControl<ListBox>("MeetingDays");
 
-            info.Text = id.Text = password.Text = "";
-            time.SelectedTime = TimeSpan.Zero;
-            prefix.IsChecked = false;
+            info.Text = id.Text = password.Text = prefix.Text = "";
+            startTime.SelectedTime = endTime.SelectedTime = TimeSpan.Zero;
             meetingDays.SelectedItems = null;
         }
         
@@ -258,15 +278,17 @@ namespace ZoomScheduler
             TextBox info = this.FindControl<TextBox>("MeetingInfo_TextBox2");
             TextBox id = this.FindControl<TextBox>("MeetingId_TextBox2");
             TextBox password = this.FindControl<TextBox>("MeetingPwd_TextBox2");
-            TimePicker time = this.FindControl<TimePicker>("MeetingSelectedTime2");
-            CheckBox prefix = this.FindControl<CheckBox>("MeetingPrefix2");
+            TextBox prefix = this.FindControl<TextBox>("MeetingPrefix_TextBox2");
+            TimePicker startTime = this.FindControl<TimePicker>("MeetingStartTime2");
+            TimePicker endTime = this.FindControl<TimePicker>("MeetingEndTime2");
             ListBox meetingDays = this.FindControl<ListBox>("MeetingDays2");
             
             info.Text = meeting.Name;
             id.Text = meeting.ID.ToString();
             password.Text = meeting.Password;
-            time.SelectedTime = meeting.Time;
-            prefix.IsChecked = meeting.Prefix;
+            startTime.SelectedTime = meeting.StartTime;
+            endTime.SelectedTime = meeting.EndTime;
+            prefix.Text = meeting.Prefix;
 
             List<ListBoxItem> selectedItems = new List<ListBoxItem>();
             string[] lbNames = {"Mon2", "Tue2", "Wed2", "Thu2", "Fri2", "Sat2", "Sun2"};

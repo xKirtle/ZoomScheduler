@@ -12,9 +12,10 @@ namespace ZoomScheduler
         public string Name { get; set; } = "";
         public ulong ID { get; set; }
         public string Password { get; set; } = "";
-        public TimeSpan Time { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
         public int[] Days { get; set; } = new int[7];
-        public bool Prefix { get; set; }
+        public string Prefix { get; set; } = "";
 
         public ZoomMeeting()
         {
@@ -49,11 +50,22 @@ namespace ZoomScheduler
             return true;
         }
 
-        public bool setTime(TimeSpan? time)
+        public bool setStartTime(TimeSpan? time)
         {
             if (time != null)
             {
-                Time = (TimeSpan)time;
+                StartTime = (TimeSpan)time;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool setEndTime(TimeSpan? time)
+        {
+            if (time != null)
+            {
+                EndTime = (TimeSpan) time;
                 return true;
             }
 
@@ -71,21 +83,15 @@ namespace ZoomScheduler
             return false;
         }
 
-        public bool setPrefix(bool? prefix)
+        public bool setPrefix(string prefix)
         {
-            if (prefix != null)
-            {
-                Prefix = (bool)prefix;
-                return true;
-            }
-
-            return false;
+            Prefix = prefix;
+            return true;
         }
 
         public static void ScheduleMeeting(ZoomMeeting meeting)
         {
             List<ZoomMeeting> meetings = ReadMeetings();
-            meetings ??= new List<ZoomMeeting>();
             meetings.Add(meeting);
             
             string json = JsonConvert.SerializeObject(meetings);
@@ -100,20 +106,19 @@ namespace ZoomScheduler
         public static List<ZoomMeeting> ReadMeetings()
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ZoomScheduler");
-            if (!Directory.Exists(path) || !File.Exists(Path.Combine(path, "Meetings.json"))) return null;
+            if (!Directory.Exists(path) || !File.Exists(Path.Combine(path, "Meetings.json"))) return new List<ZoomMeeting>();
 
             string json;
             using (FileStream fs = new FileStream(Path.Combine(path, "Meetings.json"), FileMode.Open, FileAccess.Read))
             using (StreamReader sr = new StreamReader(fs))
                 json = sr.ReadToEnd();
-
-            return JsonConvert.DeserializeObject<List<ZoomMeeting>>(json);
+            
+            return JsonConvert.DeserializeObject<List<ZoomMeeting>>(json) ?? new List<ZoomMeeting>();
         }
 
         public static void UnscheduleMeeting(int index)
         {
             List<ZoomMeeting> meetings = ReadMeetings();
-            meetings ??= new List<ZoomMeeting>();
             meetings.RemoveAt(index);
             
             string json = JsonConvert.SerializeObject(meetings);

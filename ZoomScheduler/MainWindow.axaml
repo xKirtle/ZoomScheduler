@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="520"
-        Width="500" Height="520"
+        mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="460"
+        Width="520" Height="460"
         x:Class="ZoomScheduler.MainWindow"
         Title="Zoom Scheduler"
         Icon="/Assets/icon.ico"
@@ -19,6 +19,12 @@
     </Window.Styles>
     
     <TabControl Name="TabControl">
+        <TabControl.Styles>
+            <Style Selector="TabItem">
+                <Setter Property="Margin" Value="7 0 0 0"/>
+            </Style>
+        </TabControl.Styles>
+        
         <TabItem Header="Schedule Meeting" FontSize="21" VerticalContentAlignment="Center" Name="ScheduleTab">
             <StackPanel Name="ScheduleSP">
                 <Grid>
@@ -43,57 +49,75 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     
-                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1"
                                Margin="0 5" 
                                Text="Meeting Information" 
                                FontSize="16"
                     />
-                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1"
                              Name="MeetingInfo_TextBox" 
                              Margin="0 5" 
                              Watermark="What is this meeting about?"
                     />
                     
-                    <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                    <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="1"
                                Margin="0 5" 
-                               Text="Enter Meeting ID" 
+                               Text="Meeting ID" 
                                FontSize="16"
                     />
-                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                    <TextBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1"
                              Name="MeetingId_TextBox" 
                              Margin="0 5" 
                              Watermark="The Zoom meeting ID"
                     />
                     
-                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" 
+                    <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="1" 
                                Margin="0 5" 
-                               Text="Enter Meeting Password (if any)" 
+                               Text="Meeting Password (if any)" 
                                FontSize="16"
                     />
-                    <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
+                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1"
                              Name="MeetingPwd_TextBox" 
                              Margin="0 5" 
                              Watermark="The Zoom meeting password"
                     />
                     
+                    <TextBlock Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="1" 
+                               Margin="0 5" 
+                               Text="Meeting Prefix (if any)" 
+                               FontSize="16"
+                               ToolTip.Tip = "https://prefix.zoom.us/j/meetingID"
+                    />
+                    <TextBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="1"
+                             Name="MeetingPrefix_TextBox" 
+                             Margin="0 5" 
+                             Watermark="For example: videoconf-colibri"
+                             ToolTip.Tip = "https://prefix.zoom.us/j/meetingID"
+                    />
+                    
                     <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
                                Margin="0 5" 
-                               Text="Choose time to join meeting" 
+                               Text="Meeting Start Time" 
                                FontSize="16"/>
                     <TimePicker Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"
                                 Margin="0 5" 
-                                Name="MeetingSelectedTime" 
+                                Name="MeetingStartTime" 
                                 ClockIdentifier="24HourClock" 
                                 MinuteIncrement="5" 
                                 SelectedTime="0"
                                 BorderBrush="#0075d6"
                     />
-                    <!-- TODO: Replace with a ComboBox providing all the possible options, or a TextBox? -->
-                    <CheckBox Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="3"
-                              Name="MeetingPrefix"
-                              Margin="50 5 0 0" 
-                              BorderBrush="#0075d6"
-                              Content="Videoconf Colibri"
+                    <TextBlock Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="3"
+                               Margin="0 5" 
+                               Text="Meeting End Time" 
+                               FontSize="16"/>
+                    <TimePicker Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="3"
+                                Margin="0 5" 
+                                Name="MeetingEndTime" 
+                                ClockIdentifier="24HourClock" 
+                                MinuteIncrement="5" 
+                                SelectedTime="0"
+                                BorderBrush="#0075d6"
                     />
                     
                     <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3"
@@ -111,7 +135,19 @@
                                 <WrapPanel IsEnabled="True"/>
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
-                    
+                        
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Style.Setters>
+                                    <Setter Property="Width" Value="65"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="BorderBrush" Value="LightGray"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Margin" Value="0 0 1 0"/>
+                                </Style.Setters>
+                            </Style>
+                        </ListBox.Styles>
+                        
                         <ListBoxItem Name="Mon" Content="Mon"/>
                         <ListBoxItem Name="Tue" Content="Tue"/>
                         <ListBoxItem Name="Wed" Content="Wed"/>
@@ -129,13 +165,17 @@
                                Background="#0075d6" 
                     />
                     
-                    <Button Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="3"
-                            HorizontalAlignment="Left"
+                    <Button Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="3" 
+                            HorizontalAlignment="Left" 
                             Name="ScheduleMeeting_Button"
                             Content="Schedule Meeting"
-                            Height="40"
+                            Height="45"
+                            Width="497"
                             VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            FontSize="22"
                             IsEnabled="False"
+                            Margin="0 7 0 0"
                     />
                 </Grid>
             </StackPanel>
@@ -143,29 +183,11 @@
         
         <TabItem Header="Unschedule Meeting" FontSize="21" VerticalContentAlignment="Center" Name="UnscheduleTab">
             <StackPanel>
-                <TextBlock Margin="0 5" Text="Choose a meeting to unschedule" FontSize="16"/>
-                <ComboBox Margin="0 5 0 0" 
-                          Name="UnscheduleMeeting_ComboBox" 
-                          Height="45"
-                          HorizontalAlignment="Stretch"
-                          BorderBrush="#0075d6">
-                    
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}"></TextBlock>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                    
-                </ComboBox>
-                
-                <Separator Margin="0 10 0 0" 
-                            Height="2"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Bottom"                   
-                           Background="#0075d6" />
-                
-                <Grid Margin="0 10" IsHitTestVisible="False">
+                <Grid Margin="0 10">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="10"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="50"/>
                         <RowDefinition Height="30"/>
@@ -181,75 +203,145 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     
-                    <TextBlock Grid.Row="0" Grid.Column="0"
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" 
+                               Margin="0 5" Text="Choose a meeting to unschedule" FontSize="16"/>
+                    <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1" 
+                              Margin="0 5 0 0" 
+                              Name="UnscheduleMeeting_ComboBox" 
+                              Height="45"
+                              HorizontalAlignment="Stretch"
+                              BorderBrush="#0075d6"
+                              IsHitTestVisible="True">
+                    
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"></TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    
+                    </ComboBox>
+                
+                    <Button Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1" 
+                            HorizontalAlignment="Left" 
+                            Name="UnscheduleMeeting_Button"
+                            Content="Unschedule Meeting"
+                            Height="45"
+                            Width="240"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            FontSize="22"
+                            IsEnabled="False"
+                            Margin="0 5 0 0"
+                    />
+                    
+                    <Separator Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
+                               Height="2"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Bottom"                   
+                               Background="#0075d6" 
+                               Margin="0 5 0 0"/>
+                    
+                    <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1"
                                Margin="0 0 10 0"
                                Text="Meeting Information" 
                                VerticalAlignment="Center"
                                FontSize="16"
+                               IsHitTestVisible="False"
                     />
-                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Name="MeetingInfo_TextBox2"/>
+                    <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="1" 
+                             Name="MeetingInfo_TextBox2" IsHitTestVisible="False"/>
                     
-                    <TextBlock Grid.Row="2" Grid.Column="0" 
+                    <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="1" 
                                Margin="0 0 10 0"
                                Text="Meeting ID" 
                                VerticalAlignment="Center"
                                FontSize="16"
                     />
-                    <TextBlock Grid.Row="2" Grid.Column="2"
+                    <TextBox Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="1" 
+                             Name="MeetingId_TextBox2" IsHitTestVisible="False"/>
+                    
+                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="1"
                                Margin="0 0 10 0"
                                Text="Meeting Password" 
                                VerticalAlignment="Center"
                                FontSize="16"
                     />
+                    <TextBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="1" 
+                             Name="MeetingPwd_TextBox2" IsHitTestVisible="False"/>
                     
-                    <TextBox Grid.Row="3" Grid.Column="0" Name="MeetingId_TextBox2"/>
-                    <TextBox Grid.Row="3" Grid.Column="2" 
-                             Name="MeetingPwd_TextBox2"
-                             Height="45"
-                             VerticalContentAlignment="Center"
-                             BorderBrush="#0075d6" 
-                    />
-                    
-                    <TextBlock Grid.Row="4" Grid.Column="0"
+                    <TextBlock Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="1"
                                Margin="0 0 10 0"
-                               Text="Meeting Time" 
+                               Text="Meeting Prefix" 
                                VerticalAlignment="Center"
                                FontSize="16"
                     />
-                    <TimePicker Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"
-                                Name="MeetingSelectedTime2"
+                    <TextBox Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="1" 
+                             Name="MeetingPrefix_TextBox2" IsHitTestVisible="False"/>
+                    
+                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="1"
+                               Margin="0 0 10 0"
+                               Text="Meeting Start Time" 
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                    />
+                    <TimePicker Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="1"
+                                Name="MeetingStartTime2"
                                 HorizontalAlignment="Left"
                                 ClockIdentifier="24HourClock" 
                                 MinuteIncrement="5" 
                                 SelectedTime="0"
                                 BorderBrush="#0075d6"
-                    />
-                    <CheckBox Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="3"
-                              Name="MeetingPrefix2"
-                              Margin="50 0 0 0" 
-                              BorderBrush="#0075d6"
-                              Content="Videoconf Colibri"
+                                IsHitTestVisible="False"
                     />
                     
-                    <TextBlock Grid.Row="6" Grid.Column="0"
+                    <TextBlock Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="1"
+                               Margin="0 0 10 0"
+                               Text="Meeting End Time" 
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                    />
+                    <TimePicker Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="1"
+                                Name="MeetingEndTime2"
+                                HorizontalAlignment="Left"
+                                ClockIdentifier="24HourClock" 
+                                MinuteIncrement="5" 
+                                SelectedTime="0"
+                                BorderBrush="#0075d6"
+                                IsHitTestVisible="False"
+                    />
+                    
+                    <TextBlock Grid.Row="9" Grid.Column="0"
                                Margin="0 0 10 0"
                                Text="Meeting Days" 
                                VerticalAlignment="Center"
                                FontSize="16"
                     />
-                    <ListBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"
+                    <ListBox Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3"
                              Name="MeetingDays2"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
                              SelectionMode="Multiple"
-                             HorizontalAlignment="Left">
+                             HorizontalAlignment="Left"
+                             IsHitTestVisible="False">
                 
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel IsEnabled="True" Focusable="False"/>
+                                <WrapPanel IsEnabled="True"/>
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
-                
+                        
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Style.Setters>
+                                    <Setter Property="Width" Value="65"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    <Setter Property="BorderBrush" Value="LightGray"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Margin" Value="0 0 1 0"/>
+                                </Style.Setters>
+                            </Style>
+                        </ListBox.Styles>
+                        
                         <ListBoxItem Name="Mon2" Content="Mon"/>
                         <ListBoxItem Name="Tue2" Content="Tue"/>
                         <ListBoxItem Name="Wed2" Content="Wed"/>
@@ -259,22 +351,6 @@
                         <ListBoxItem Name="Sun2" Content="Sun"/>
                     </ListBox>
                 </Grid>
-                
-                <Separator Margin="0 11 0 10" 
-                           Height="2"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Bottom"                   
-                           Background="#0075d6" 
-                />
-                
-                <Button HorizontalAlignment="Left" 
-                        Name="UnscheduleMeeting_Button"
-                        Content="Unschedule Meeting"
-                        Height="40"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="False"
-                />
-                
             </StackPanel>
         </TabItem>
         
