@@ -52,15 +52,20 @@ namespace ZoomScheduler
             #endregion
             
             #region Settings Tab
-            //TODO: Read and update settings from Settings.json in Roaming? 
+            //TODO: Read and update settings from Settings.json in Roaming?
             settingsCheckBoxes = new List<CheckBox>();
+            
+            StackPanel settings = this.FindControl<StackPanel>("SettingsSP");
+            settings.LayoutUpdated += (sender, args) => SaveSettings(); 
+            
             CheckBox startup = this.FindControl<CheckBox>("StartupCheckBox");
             startup.Tapped += (__, _) => StartupOnSystemBoot(startup.IsChecked ?? false);
             settingsCheckBoxes.Add(startup);
-
-            // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
+            
             CheckBox minimizeToTray = this.FindControl<CheckBox>("MinimizeToTrayCheckBox");
             settingsCheckBoxes.Add(minimizeToTray);
+            
+            // CheckBox popupNotif = this.FindControl<CheckBox>("PopUpNotificationsCheckBox");
             #endregion
             
             UpdateScheduledMeetings();
@@ -106,11 +111,17 @@ namespace ZoomScheduler
                 #pragma warning disable
                 RegistryKey rk = Registry.CurrentUser.OpenSubKey
                     ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce", false);
+                
+                bool oldValue = settingsCheckBoxes[0].IsChecked.Value;
                 settingsCheckBoxes[0].IsChecked = rk.GetValue("ZoomSchedulerService") != null;
+                if (oldValue != (settingsCheckBoxes[0].IsChecked))
+                    SaveSettings();
             }
         }
 
-        private void OnClosing(object? sender, CancelEventArgs e)
+        private void OnClosing(object? sender, CancelEventArgs e) => SaveSettings();
+
+        private void SaveSettings()
         {
             //Save CheckBoxes values in the Settings
             System.Nullable<bool>[] options = settingsCheckBoxes.Select(x => x.IsChecked).ToArray();
@@ -127,8 +138,8 @@ namespace ZoomScheduler
         {
             //Happens before e.Key is added to the textbox
             
-            string text = ((TextBox) sender).Text;
-            Console.WriteLine(e.Key);
+            // string text = ((TextBox) sender).Text;
+            // Console.WriteLine(e.Key);
             
             //TODO: apply regex here?
         }

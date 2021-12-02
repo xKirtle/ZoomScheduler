@@ -359,7 +359,7 @@
                 <Image Source="Assets/cog-icon.ico" Width="45" Height="45"/>
             </TabItem.Header>
             
-            <StackPanel>
+            <StackPanel Name="SettingsSP">
                 <CheckBox Content="Run Zoom Scheduler on computer startup"
                           Name="StartupCheckBox"
                           HorizontalAlignment="Left"
