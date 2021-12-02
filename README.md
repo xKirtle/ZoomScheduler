@@ -44,6 +44,10 @@
 * [AvaloniaUI](https://avaloniaui.net/)
 * [.NET Core](https://dotnet.microsoft.com/download/dotnet/5.0)
 
+## Download
+
+You can find the latest version in the [Releases section](https://github.com/xKirtle/ZoomScheduler/releases)
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
